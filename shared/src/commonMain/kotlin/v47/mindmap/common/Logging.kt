@@ -1,3 +1,3 @@
 package v47.mindmap.common
 
-expect fun log(tag: String, message: String)
+expect fun <T : Any> T.log(message: () -> String): T

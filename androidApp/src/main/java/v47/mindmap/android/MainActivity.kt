@@ -1,9 +1,9 @@
 package v47.mindmap.android
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
@@ -15,14 +15,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import v47.mindmap.ThoughtPresenter
 import v47.mindmap.ThoughtView
@@ -49,10 +46,10 @@ class MainActivity : ComponentActivity(), ThoughtView {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    DefaultThought(model = state) { parent, current ->
+                    DefaultThought(model = state) { current ->
                         // crap
                         GlobalScope.launch(Dispatchers.Main) {
-                            _events.emit(ThoughtView.Event.Select(parent, current))
+                            _events.emit(ThoughtView.Event.Select(current))
                         }
                     }
                 }
@@ -75,8 +72,7 @@ class MainActivity : ComponentActivity(), ThoughtView {
 
 
 @Composable
-fun DefaultThought(model: ThoughtView.Model, onSelected: (Id.Known, Id.Known) -> Unit) {
-    val context = LocalContext.current
+fun DefaultThought(model: ThoughtView.Model, onSelected: (Id.Known) -> Unit) {
     when (model) {
         is ThoughtView.Model.Empty -> Text(text = "Empty!")
         is ThoughtView.Model.Default -> Thought(model.thought, onSelected)
@@ -86,31 +82,47 @@ fun DefaultThought(model: ThoughtView.Model, onSelected: (Id.Known, Id.Known) ->
 @Composable
 fun Thought(
     model: ThoughtView.Model.Thought,
-    selected: (Id.Known, Id.Known) -> Unit,
+    selected: (Id.Known) -> Unit,
 ) {
     Row {
         Text(text = model.title)
         // shouldn't be here, go sleep
-        val parent = model.parent
         val nextId = model.next
         if (nextId is Id.Known) {
-            Button(onClick = { selected(parent, nextId) }) {
+            Button(onClick = { selected(nextId) }) {
                 Text(text = "Next")
             }
         }
-        val prevId = model.previous
+        val prevId = model.prev
         if (prevId is Id.Known) {
-            Button(onClick = { selected(parent, prevId) }) {
+            Button(onClick = { selected(prevId) }) {
                 Text(text = "prev")
             }
         }
-        val childId = model.child
-        if (childId is Id.Known) {
-            Button(onClick = { selected(parent, childId) }) {
-                Text(text = "child")
+        val parent = model.parent
+        if (parent is Id.Known) {
+            Button(onClick = { selected(parent) }) {
+                Text(text = "parent")
             }
         }
-        Text(text = model.toString(), color = Color.Red)
+        val children = model.children
+        if (children.isNotEmpty()) {
+            Children(children = children, selected)
+        }
+    }
+}
+
+@Composable
+private fun Children(
+    children: List<Id.Known>,
+    selected: (Id.Known) -> Unit
+) {
+    Column {
+        children.forEach { child ->
+            Button(onClick = { selected(child) }) {
+                Text(text = child.toString())
+            }
+        }
     }
 }
 

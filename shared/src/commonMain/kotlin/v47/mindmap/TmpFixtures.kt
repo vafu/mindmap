@@ -14,28 +14,16 @@ internal val FIXED_THOUGHTS =
         fixedThough("AB"),
         fixedThough("BA"),
         fixedThough("BB"),
+        fixedThough("BAB"),
+        fixedThough("BAA"),
     )
 
-internal val FIXED_CONNECTIONS: Connection =
-    Connection.Interim(
-        "entry".id,
-        listOf(
-            Connection.Interim(
-                "A".id,
-                listOf(
-                    Connection.Terminal("AA".id),
-                    Connection.Terminal("AB".id),
-                )
-            ),
-            Connection.Interim(
-                "B".id,
-                listOf(
-                    Connection.Terminal("BA".id),
-                    Connection.Terminal("BB".id),
-                )
-            ),
-        )
-    )
+val FIXED_MAPPING = hashMapOf<Id.Known, Set<Id.Known>>(
+    "entry".id to setOf("A".id, "B".id),
+    "A".id to setOf("AA".id, "AB".id),
+    "B".id to setOf("BA".id, "BB".id),
+    "BA".id to setOf("BAA".id, "BAB".id),
+)
 
 internal fun fixedThough(title: String): Pair<Id.Known, Thought> =
     title.id.let { it to Thought(it, title) }
