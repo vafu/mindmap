@@ -2,7 +2,6 @@ package v47.mindmap
 
 import v47.mindmap.common.Id
 import v47.mindmap.common.id
-import v47.mindmap.connections.Connection
 import v47.mindmap.thought.Thought
 
 internal val FIXED_THOUGHTS =
