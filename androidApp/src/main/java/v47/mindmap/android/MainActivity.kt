@@ -5,11 +5,17 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallTopAppBar
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,10 +29,12 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import v47.mindmap.ThoughtPresenter
 import v47.mindmap.ThoughtView
+import v47.mindmap.android.ui.theme.MyApplicationTheme
 import v47.mindmap.common.Id
 import v47.mindmap.connections.StaticConnectionsRepository
 import v47.mindmap.thought.StaticThoughtRepository
 
+@OptIn(ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity(), ThoughtView {
 
     // tmp, need better arch
@@ -42,14 +50,15 @@ class MainActivity : ComponentActivity(), ThoughtView {
         super.onCreate(savedInstanceState)
         setContent {
             MyApplicationTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    DefaultThought(model = state) { current ->
-                        // crap
-                        GlobalScope.launch(Dispatchers.Main) {
-                            _events.emit(ThoughtView.Event.Select(current))
+                Scaffold(
+                    topBar = { TopBar(model = state) },
+                ) { padding ->
+                    Surface(Modifier.padding(padding)) {
+                        DefaultThought(model = state) { current ->
+                            // crap
+                            GlobalScope.launch(Dispatchers.Main) {
+                                _events.emit(ThoughtView.Event.Select(current))
+                            }
                         }
                     }
                 }
@@ -85,8 +94,6 @@ fun Thought(
     selected: (Id.Known) -> Unit,
 ) {
     Row {
-        Text(text = model.title)
-        // shouldn't be here, go sleep
         val nextId = model.next
         if (nextId is Id.Known) {
             Button(onClick = { selected(nextId) }) {
@@ -126,10 +133,30 @@ private fun Children(
     }
 }
 
-@Preview
 @Composable
-fun DefaultPreview() {
-    MyApplicationTheme {
+private fun TopBar(
+    model: ThoughtView.Model
+) {
+    SmallTopAppBar(
+        actions = {
+            IconButton(
+                onClick = {
 
-    }
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "desc"
+                )
+            }
+        },
+        title = {
+            val title = when (model) {
+                is ThoughtView.Model.Empty -> "empty"
+                is ThoughtView.Model.Default ->
+                    model.thought.title
+            }
+            Text(text = title)
+        }
+    )
 }
