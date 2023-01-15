@@ -8,12 +8,17 @@ interface ConnectionsRepository {
 
     suspend fun query(criteria: Criteria): Result<Connection>
 
+    suspend fun connect(from: Id.Known, to: Id.Known): Boolean
+
     sealed class Criteria {
 
         object Root : Criteria()
         data class ById(val id: Id.Known) : Criteria()
     }
 }
+
+suspend fun ConnectionsRepository.query(id: Id.Known) =
+    query(ConnectionsRepository.Criteria.ById(id))
 
 sealed class Connection {
 
@@ -34,6 +39,8 @@ sealed class Connection {
 
 object StaticConnectionsRepository : ConnectionsRepository {
 
+    private val connections = FIXED_MAPPING.toMutableMap()
+
     override suspend fun query(criteria: ConnectionsRepository.Criteria): Result<Connection> =
         when (criteria) {
             ConnectionsRepository.Criteria.Root ->
@@ -44,22 +51,28 @@ object StaticConnectionsRepository : ConnectionsRepository {
             }
         }
 
+    override suspend fun connect(from: Id.Known, to: Id.Known): Boolean {
+        connections.getOrPut(from, ::mutableSetOf).toMutableSet()
+            .add(to)
+        return true
+    }
+
     private fun createConnection(id: Id.Known): Connection {
         // ineffective as FUCK
-        val parent = FIXED_MAPPING.entries.find { (_, v) -> v.any { it == id } }
+        val parent = connections.entries.find { (_, v) -> v.any { it == id } }
         return if (parent != null) {
             Connection.Interim(
                 id,
                 { createConnection(parent.key) },
                 {
-                    FIXED_MAPPING[id]?.map {
+                    connections[id]?.map {
                         createConnection(it)
                     } ?: emptyList()
                 }
             )
         } else {
             Connection.Root(id) {
-                FIXED_MAPPING[id]?.map {
+                connections[id]?.map {
                     createConnection(it)
                 } ?: emptyList()
             }
