@@ -43,9 +43,17 @@ class DefaultThoughtViewModel(
     private val _models = MutableStateFlow<Model>(Model.Empty)
     override val models: Flow<Model> = _models
 
+    init {
+        loadThought(ConnectionsRepository.Criteria.Root)
+    }
+
     override fun loadThought(id: Id.Known) {
+        loadThought(ConnectionsRepository.Criteria.ById(id))
+    }
+
+    private fun loadThought(criteria: ConnectionsRepository.Criteria) {
         scope.launch {
-            connectionsRepository.query(ConnectionsRepository.Criteria.ById(id))
+            connectionsRepository.query(criteria)
                 .getOrThrow()
                 .asModel()
                 .let { _models.emit(it) }

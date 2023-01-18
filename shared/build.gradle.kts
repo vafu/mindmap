@@ -23,7 +23,7 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
                 implementation("io.realm.kotlin:library-base:1.4.0")
-
+                implementation("io.insert-koin:koin-core:3.3.2")
             }
         }
         val commonTest by getting {
