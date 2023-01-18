@@ -1,4 +1,4 @@
-package v47.mindmap
+package v47.mindmap.viewmodels
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -60,7 +60,7 @@ class DefaultThoughtViewModel(
         }
     }
 
-    private suspend fun Connection.asModel(): ThoughtViewModel.Model {
+    private suspend fun Connection.asModel(): Model {
         val current = this
         val parent = if (current is Connection.Interim) {
             current.parent()

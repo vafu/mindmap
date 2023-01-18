@@ -1,6 +1,9 @@
 package v47.mindmap.android.ui
 
-internal object Nav {
-    const val MAIN = "MAIN"
-    const val ADD = "ADD"
+internal sealed class Navigation(val tag: String) {
+
+    object Main : Navigation("MAIN")
+    object NewThought : Navigation("NEW")
 }
+
+internal typealias Navigator = (Navigation) -> Unit

@@ -17,22 +17,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import org.koin.androidx.compose.koinViewModel
-import v47.mindmap.ThoughtViewModel
+import v47.mindmap.viewmodels.ThoughtViewModel
 import v47.mindmap.common.Id
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ThoughtScreen(
-    navController: NavController,
+    navigator: Navigator,
     viewModel: ThoughtViewModel = koinViewModel(),
 ) {
     val state by viewModel.models.collectAsState(ThoughtViewModel.Model.Empty)
     Scaffold(
-        topBar = { TopBar(model = state, navController) },
+        topBar = { TopBar(model = state, navigator) },
     ) { padding ->
         Surface(Modifier.padding(padding)) {
             DefaultThought(model = state) { current ->
@@ -101,13 +98,13 @@ private fun Children(
 @Composable
 private fun TopBar(
     model: ThoughtViewModel.Model,
-    navController: NavController,
+    navigator: Navigator,
 ) {
     SmallTopAppBar(
         actions = {
             IconButton(
                 onClick = {
-                    navController.navigate(Nav.ADD)
+                    navigator(Navigation.NewThought)
                 }
             ) {
                 Icon(
