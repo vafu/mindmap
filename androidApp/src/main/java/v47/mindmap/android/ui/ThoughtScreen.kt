@@ -2,6 +2,7 @@ package v47.mindmap.android.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -31,7 +32,11 @@ internal fun ThoughtScreen(
     Scaffold(
         topBar = { TopBar(model = state, navigator) },
     ) { padding ->
-        Surface(Modifier.padding(padding)) {
+        Surface(
+            Modifier
+                .padding(padding)
+                .fillMaxSize()
+        ) {
             DefaultThought(model = state) { current ->
                 viewModel.loadThought(current)
             }
@@ -104,7 +109,6 @@ private fun TopBar(
         actions = {
             IconButton(
                 onClick = {
-                    navigator(Navigation.NewThought)
                 }
             ) {
                 Icon(

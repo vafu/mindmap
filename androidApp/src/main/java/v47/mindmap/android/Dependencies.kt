@@ -2,16 +2,11 @@ package v47.mindmap.android
 
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import v47.mindmap.viewmodels.DefaultNewThoughtViewModel
-import v47.mindmap.viewmodels.DefaultThoughtViewModel
-import v47.mindmap.viewmodels.NewThoughtViewModel
-import v47.mindmap.viewmodels.ThoughtViewModel
+import v47.mindmap.viewmodels.DefaultThoughtPreviewViewModel
+import v47.mindmap.viewmodels.ThoughtPreviewViewModel
 
 val viewModels = module {
-    viewModel<ThoughtViewModel> {
-        DefaultThoughtViewModel(get(), get())
-    }
-    viewModel<NewThoughtViewModel> {
-        DefaultNewThoughtViewModel(get(), get())
+    viewModel<ThoughtPreviewViewModel> {
+        DefaultThoughtPreviewViewModel(get(), get())
     }
 }

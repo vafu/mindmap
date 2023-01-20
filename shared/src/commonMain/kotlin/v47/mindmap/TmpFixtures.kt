@@ -25,4 +25,4 @@ val FIXED_MAPPING = hashMapOf<Id.Known, Set<Id.Known>>(
 )
 
 internal fun fixedThough(title: String): Pair<Id.Known, Thought> =
-    title.id.let { it to Thought(it, title) }
+    title.id.let { it to Thought.Text(it, title, "Content") }
